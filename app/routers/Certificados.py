@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+from sqlmodel import select
+from app.database.database import get_db, get_session
 from app.core.security import get_current_user
-
-# Importações corrigidas para usar o caminho absoluto do projeto
-from app.database.database import get_db
 from app.models.Certificados import Certificado
 from app.models.usuario import Usuario
 from app.schemas.Certificados import (
@@ -13,27 +12,41 @@ from app.schemas.Certificados import (
 )
 
 router = APIRouter(
-    prefix="/certificados",
-    tags=["certificados"]
+    tags=["Certificados"]
 )
 
-@router.post("/", response_model=CertificadoResponse)
-def criar_certificado(
-    request: CertificadoCreate,
+# =========================
+# LISTAR CERTIFICADOS DO USUÁRIO LOGADO
+# =========================
+@router.get("/me", response_model=List[CertificadoResponse])
+def listar_meus_certificados(
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(get_current_user) # <--- O segredo está aqui!
+    current_user: Usuario = Depends(get_current_user)
 ):
-    # Verificação de regra de negócio
-    if usuario.tipo == "professor":
+    certificados = db.query(Certificado).filter(
+        Certificado.usuario_id == current_user.id
+    ).all()
+
+    return certificados
+
+# =========================
+# CRIAR CERTIFICADO
+# =========================
+@router.post("/criar/me", response_model=CertificadoResponse, status_code=201)
+def criar_certificado(
+    data: CertificadoCreate,
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(get_current_user)
+):
+    if user.tipo == "professor":
         raise HTTPException(
             status_code=403,
             detail="Professores não podem criar certificados"
         )
 
-    # Criação da instância usando model_dump() (Pydantic V2)
     certificado = Certificado(
-        **request.model_dump(),
-        usuario_id=usuario.id
+        **data.model_dump(),
+        usuario_id=user.id
     )
 
     db.add(certificado)
@@ -43,60 +56,32 @@ def criar_certificado(
     return certificado
 
 
-@router.get(
-    "/usuario/{usuario_id}",
-    response_model=List[CertificadoResponse]
-)
-def listar_certificados_usuario(
-    usuario_id: int,
-    db: Session = Depends(get_db)
-):
-    certificados = db.query(Certificado).filter(
-        Certificado.usuario_id == usuario_id
-    ).all()
+# =========================
+# Visualizar Certificados
+# =========================
 
-    return certificados
-
-@router.put("/{certificado_id}", response_model=CertificadoResponse)
-def editar_certificado(
-    certificado_id: int,
-    request: CertificadoCreate,
-    db: Session = Depends(get_db),
-    usuario: Usuario = Depends()
-):
-    # Forma moderna de buscar por ID no SQLAlchemy
-    certificado = db.get(Certificado, certificado_id)
-
-    if not certificado:
+@router.get("/{id}", response_model=CertificadoResponse)
+def get_certificado(id: int, session: Session = Depends(get_session)):
+    cert = session.get(Certificado, id)
+    if not cert:
         raise HTTPException(status_code=404, detail="Certificado não encontrado")
+    return cert
 
-    if certificado.usuario_id != usuario.id:
-        raise HTTPException(
-            status_code=403,
-            detail="Você não pode editar este certificado"
-        )
-
-    # Atualização dinâmica dos campos
-    for campo, valor in request.model_dump().items():
-        setattr(certificado, campo, valor)
-
-    db.commit()
-    db.refresh(certificado)
-
-    return certificado
-
-@router.delete("/{certificado_id}")
+# =========================
+# DELETAR CERTIFICADO
+# =========================
+@router.delete("/{certificado_id}", status_code=204)
 def deletar_certificado(
     certificado_id: int,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends()
+    user: Usuario = Depends(get_current_user)
 ):
     certificado = db.get(Certificado, certificado_id)
 
     if not certificado:
-        raise HTTPException(status_code=404, detail="Certificado não encontrado")
+        raise HTTPException(404, "Certificado não encontrado")
 
-    if certificado.usuario_id != usuario.id:
+    if certificado.usuario_id != user.id:
         raise HTTPException(
             status_code=403,
             detail="Você não pode apagar este certificado"
@@ -105,6 +90,3 @@ def deletar_certificado(
     db.delete(certificado)
     db.commit()
 
-    return {"detail": "Certificado removido com sucesso"}
-
- 

@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     @field_validator("ALLOWED_ORIGINS", mode="before")
     @classmethod
     def assemble_allowed_origins(cls, v):
-        if isinstance(v, str) and not v.startswith("["):
+        if isinstance(v, str) and not v.startswith("[]"):
             return [i.strip() for i in v.split(",")]
         return v
 

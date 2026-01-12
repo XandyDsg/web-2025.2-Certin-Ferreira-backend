@@ -12,7 +12,11 @@ class ProfessorUsuarioCreate(ProfessorUsuarioBase):
     email: str
     senha: str
 
-class ProfessorUsuarioUpdate(BaseModel):
+class ProfessorUsuarioLogin(ProfessorUsuarioBase):
+    email: str
+    senha: str
+
+class ProfessorUsuarioUpdate(ProfessorUsuarioBase):
     nome_professor: Optional[str] = None
     curso_professor: Optional[str] = None
     instituicao: Optional[str] = None

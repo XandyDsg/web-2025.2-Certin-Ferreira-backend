@@ -25,26 +25,3 @@ class ProfessorUsuario(Base):
         cascade="all, delete-orphan"
     )
 
-
-class Projeto(Base):
-    __tablename__ = "projetos"
-
-    id = Column(Integer, primary_key=True, index=True)
-
-    titulo = Column(String, nullable=False)
-    descricao = Column(String, nullable=True)
-
-    email = Column(String, nullable=False)
-
-    data_inicio = Column(Date, nullable=False)
-    data_final = Column(Date, nullable=True)
-
-    professor_usuario_id = Column(
-        Integer,
-        ForeignKey("professor_usuarios.id")
-    )
-
-    professor_usuario = relationship(
-        "ProfessorUsuario",
-        back_populates="projetos"
-    )
