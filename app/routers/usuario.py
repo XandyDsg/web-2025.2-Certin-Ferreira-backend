@@ -88,7 +88,6 @@ def listar_idiomas(
         return []
     return user.idiomas or []
 
-from fastapi import Query
 
 @router.get("/buscar", response_model=list[UsuarioPublico])
 def buscar_usuarios(

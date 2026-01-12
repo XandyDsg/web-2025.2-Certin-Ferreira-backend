@@ -1,4 +1,4 @@
-# app/models/vagas_projetos.py
+
 from sqlalchemy import Column, Integer, String, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from app.database.database import Base
