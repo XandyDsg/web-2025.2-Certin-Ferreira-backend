@@ -90,3 +90,17 @@ def deletar_certificado(
     db.delete(certificado)
     db.commit()
 
+@router.get("/usuario/{usuario_id}", response_model=List[CertificadoResponse])
+def listar_certificados_usuario(
+    usuario_id: int,
+    session: Session = Depends(get_session),
+):
+    usuario = session.get(Usuario, usuario_id)
+
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    return usuario.certificados or []
+
+
+

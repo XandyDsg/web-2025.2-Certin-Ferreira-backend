@@ -35,3 +35,12 @@ class CertificadoResponse(CertificadoCreate):
 
     class Config:
         from_attributes = True
+
+class CertificadoPublico(BaseModel):
+    id: int
+    titulo: str
+    descricao: str | None
+    data_criacao: str
+
+    class Config:
+        from_attributes = True

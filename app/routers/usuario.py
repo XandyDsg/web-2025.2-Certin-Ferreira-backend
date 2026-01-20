@@ -44,7 +44,10 @@ def signup(usuario: UsuarioCreate, db: Session = Depends(get_db)):
 
     return {"detail": "Usuário criado com sucesso"}
 
-
+@router.post ("/logout")
+def logout():
+    return {"detail": "Logout realizado com sucesso"}
+# =========================
 
 @router.get("/me", response_model=UsuarioResponse)
 def me(user: Usuario = Depends(get_current_user)):
@@ -93,7 +96,7 @@ def listar_idiomas(
 def buscar_usuarios(
     q: str = Query(..., min_length=2),
     session: Session = Depends(get_session),
-    user: Usuario = Depends(get_current_user)
+    user: Usuario = Depends(get_current_user)  # Mantém a dependência para autenticação
 ):
     resultados = session.exec(
         select(Usuario)
@@ -102,3 +105,17 @@ def buscar_usuarios(
     ).all()
 
     return resultados
+
+@router.get("/{usuario_id}", response_model=UsuarioPublico)
+def obter_usuario_publico(
+    usuario_id: int,
+    session: Session = Depends(get_session),
+    user: Usuario = Depends(get_current_user),
+):
+    usuario = session.get(Usuario, usuario_id)
+
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    return usuario
+

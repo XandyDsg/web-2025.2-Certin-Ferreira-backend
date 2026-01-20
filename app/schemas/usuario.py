@@ -71,6 +71,6 @@ class UsuarioPublico(BaseModel):
     semestre: int | None
     formacoes: list[dict] = []
     idiomas: list[dict] = []
-
+    
     class Config:
         from_attributes = True
