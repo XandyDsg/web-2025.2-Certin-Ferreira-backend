@@ -1,16 +1,36 @@
+# ===== Core =====
 fastapi==0.128.0
 uvicorn==0.40.0
+starlette==0.50.0
 
-sqlalchemy==2.0.45
-sqlmodel==0.0.16
+# ===== Banco de dados =====
+SQLAlchemy==2.0.45
+sqlmodel==0.0.24
+greenlet==3.3.0
 
+# ===== Autenticação e segurança =====
 python-jose==3.5.0
-passlib[bcrypt]==1.7.4
+passlib==1.7.4
 bcrypt==5.0.0
+ecdsa==0.19.1
+rsa==4.9.1
+pyasn1==0.6.1
+six==1.17.0
 
-python-dotenv==1.2.1
-python-multipart
-
+# ===== Validação e configuração =====
 pydantic==2.12.5
 pydantic-settings==2.12.0
-starlette==0.50.0
+pydantic_core==2.41.5
+email-validator==2.2.0
+annotated-types==0.7.0
+typing_extensions==4.15.0
+typing-inspection==0.4.2
+
+# ===== Utilidades =====
+python-dotenv==1.2.1
+python-multipart==0.0.9
+anyio==4.12.1
+h11==0.16.0
+idna==3.11
+click==8.3.1
+colorama==0.4.6
