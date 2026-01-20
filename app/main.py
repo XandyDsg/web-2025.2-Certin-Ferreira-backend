@@ -16,7 +16,7 @@ def on_startup():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Simplificado para aceitar conexões do React (localhost:5173)
+    allow_origins=["https://front-end-certin-app.vercel.app/"], # Simplificado para aceitar conexões do React (localhost:5173)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
