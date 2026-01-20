@@ -14,13 +14,20 @@ def on_startup():
     Base.metadata.create_all(bind=engine)
 
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://front-end-certin-app.vercel.app"], # Simplificado para aceitar conexões do React (localhost:5173)
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://front-end-certin-app.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Registros sem o prefixo complexo para bater com seu Frontend atual
 
