@@ -1,29 +1,37 @@
-from sqlmodel import SQLModel, create_engine, Session
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
 from app.core.config import settings
-
-# =====================
-# ENGINE
-# =====================
+from sqlmodel import SQLModel, create_engine, Session
 
 if not settings.DATABASE_URL:
-    raise ValueError("DATABASE_URL não foi carregada. Verifique o .env")
+    raise ValueError("A variável DATABASE_URL não foi carregada. Verifique o arquivo .env")
+engine = create_engine(settings.DATABASE_URL)
+
 
 engine = create_engine(
     settings.DATABASE_URL,
     connect_args={"check_same_thread": False}  # necessário para SQLite
 )
 
-# =====================
-# SESSION
-# =====================
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
+
+Base = declarative_base()
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 def get_session():
     with Session(engine) as session:
         yield session
 
-# =====================
-# CREATE TABLES
-# =====================
-
 def create_tables():
-    SQLModel.metadata.create_all(engine)
+    Base.metadata.create_all(bind=engine) aqui o meu database.py em database
