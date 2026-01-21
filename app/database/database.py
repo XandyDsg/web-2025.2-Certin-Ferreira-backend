@@ -34,4 +34,4 @@ def get_session():
         yield session
 
 def create_tables():
-    Base.metadata.create_all(bind=engine) aqui o meu database.py em database
+    Base.metadata.create_all(bind=engine) 
